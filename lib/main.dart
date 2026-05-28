@@ -15,15 +15,12 @@ import 'core/di/provider_overrides.dart';
 import 'core/logging/app_logger.dart';
 
 void main() {
-  // Catch any error before Flutter binding is ready
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // Set up Flutter-level error handling
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
       debugPrint('FLUTTER ERROR: ${details.exception}');
-      debugPrint('  Stack: ${details.stack}');
       AppLogger.instance.error(
         'Flutter error',
         details.exception,
@@ -37,21 +34,22 @@ void main() {
           .initialize()
           .timeout(const Duration(seconds: 3));
     } catch (e) {
-      debugPrint('Logger init failed (non-fatal): $e');
+      debugPrint('Logger init failed: $e');
     }
     AppLogger.instance.info('App starting');
 
-    // ── Portrait lock ──────────────────────────────────────
-    try {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-    } catch (e) {
-      debugPrint('Orientation lock failed: $e');
-    }
+    // ── Portrait lock (non-blocking, can hang on MIUI) ─────
+    AppLogger.instance.info('Setting orientations');
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]).timeout(const Duration(seconds: 2))
+      .catchError((e) {
+        AppLogger.instance.warn('Orientation lock failed: $e');
+      });
 
     // ── Status bar ─────────────────────────────────────────
+    AppLogger.instance.info('Setting system UI');
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -62,12 +60,12 @@ void main() {
     );
 
     // ── Hive ───────────────────────────────────────────────
+    AppLogger.instance.info('Initializing Hive');
     try {
       await HiveCacheService.initialize()
           .timeout(const Duration(seconds: 5));
       AppLogger.instance.info('Hive initialized');
     } catch (e) {
-      debugPrint('Hive init failed: $e');
       AppLogger.instance.error('Hive init failed', e);
     }
 
@@ -80,10 +78,10 @@ void main() {
         child: const Mt5App(),
       ),
     );
+    AppLogger.instance.info('runApp returned');
   }, (error, stack) {
-    // Top-level error handler — catches anything missed
     debugPrint('UNCAUGHT: $error');
-    debugPrint('  Stack: $stack');
+    debugPrint('STACK: $stack');
     AppLogger.instance.error('Uncaught error', error, stack);
   });
 }
