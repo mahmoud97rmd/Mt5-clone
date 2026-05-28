@@ -2,7 +2,6 @@
 // ============================================================
 // MT5 Clone — Hive Cache Service
 // Fast synchronous cache for real-time price data.
-// Used by AccountMathEngine for O(1) price access on every tick.
 // ============================================================
 
 import 'package:hive_flutter/hive_flutter.dart';
@@ -12,15 +11,25 @@ class HiveCacheService {
   static const String _accountBoxName = 'account';
   static const String _settingsBoxName = 'settings';
 
-  static late Box<Map> _tickBox;
-  static late Box<Map> _accountBox;
-  static late Box _settingsBox;
+  static Box<Map>? _tickBox;
+  static Box<Map>? _accountBox;
+  static Box? _settingsBox;
+  static bool _initialized = false;
+
+  static bool get isReady => _initialized;
 
   static Future<void> initialize() async {
-    await Hive.initFlutter();
-    _tickBox = await Hive.openBox<Map>(_tickBoxName);
-    _accountBox = await Hive.openBox<Map>(_accountBoxName);
-    _settingsBox = await Hive.openBox(_settingsBoxName);
+    if (_initialized) return;
+    try {
+      await Hive.initFlutter();
+      _tickBox = await Hive.openBox<Map>(_tickBoxName);
+      _accountBox = await Hive.openBox<Map>(_accountBoxName);
+      _settingsBox = await Hive.openBox(_settingsBoxName);
+      _initialized = true;
+    } catch (e) {
+      // App works without cache — just log and continue
+      print('HiveCacheService: init failed — $e');
+    }
   }
 
   // ── Tick Cache (synchronous for hot path) ────────────────────
@@ -34,7 +43,7 @@ class HiveCacheService {
     double? sessionHigh,
     double? sessionLow,
   }) {
-    _tickBox.put(symbol, {
+    _tickBox?.put(symbol, {
       'bid': bid,
       'ask': ask,
       'spread': spread,
@@ -45,22 +54,22 @@ class HiveCacheService {
   }
 
   static double? getLatestBid(String symbol) {
-    final data = _tickBox.get(symbol);
+    final data = _tickBox?.get(symbol);
     return data?['bid'] as double?;
   }
 
   static double? getLatestAsk(String symbol) {
-    final data = _tickBox.get(symbol);
+    final data = _tickBox?.get(symbol);
     return data?['ask'] as double?;
   }
 
   static double? getLatestSpread(String symbol) {
-    final data = _tickBox.get(symbol);
+    final data = _tickBox?.get(symbol);
     return data?['spread'] as double?;
   }
 
   static Map<String, dynamic>? getLatestTick(String symbol) {
-    final data = _tickBox.get(symbol);
+    final data = _tickBox?.get(symbol);
     if (data == null) return null;
     return Map<String, dynamic>.from(data);
   }
@@ -76,7 +85,7 @@ class HiveCacheService {
     double? marginLevel,
     required double unrealizedPnl,
   }) {
-    _accountBox.put(accountId, {
+    _accountBox?.put(accountId, {
       'balance': balance,
       'equity': equity,
       'marginUsed': marginUsed,
@@ -87,7 +96,7 @@ class HiveCacheService {
   }
 
   static Map<String, dynamic>? getAccountState(String accountId) {
-    final data = _accountBox.get(accountId);
+    final data = _accountBox?.get(accountId);
     if (data == null) return null;
     return Map<String, dynamic>.from(data);
   }
@@ -95,21 +104,21 @@ class HiveCacheService {
   // ── Settings Cache ──────────────────────────────────────────
 
   static dynamic getSetting(String key, {dynamic defaultValue}) {
-    return _settingsBox.get(key, defaultValue: defaultValue);
+    return _settingsBox?.get(key, defaultValue: defaultValue);
   }
 
   static Future<void> setSetting(String key, dynamic value) async {
-    await _settingsBox.put(key, value);
+    await _settingsBox?.put(key, value);
   }
 
   // ── Cleanup ─────────────────────────────────────────────────
 
   static Future<void> clearTickCache() async {
-    await _tickBox.clear();
+    await _tickBox?.clear();
   }
 
   static Future<void> clearAll() async {
-    await _tickBox.clear();
-    await _accountBox.clear();
+    await _tickBox?.clear();
+    await _accountBox?.clear();
   }
 }
