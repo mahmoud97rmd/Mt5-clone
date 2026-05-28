@@ -35,7 +35,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ref.watch(isCredentialsConfiguredProvider);
 
   return GoRouter(
-    initialLocation: RouteNames.splash,
+    initialLocation: RouteNames.trading,
     debugLogDiagnostics: true,
 
     // ── Auth Redirect Guard ────────────────────────────────

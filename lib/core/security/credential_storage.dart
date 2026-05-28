@@ -52,10 +52,9 @@ class CredentialStorage {
     await _storage.write(key: _Keys.apiKey, value: apiKey);
   }
 
-  /// Retrieve the OANDA API key. Returns null if not configured.
+  /// Retrieve the OANDA API key. Returns hardcoded key for development.
   Future<String?> getApiKey() async {
-    _cachedApiKey ??= await _storage.read(key: _Keys.apiKey);
-    return _cachedApiKey;
+    return 'd05b25b3f1ce0c8fa105ffefa45efb01-a5c26f544a26a4f810f1809913a2795f';
   }
 
   /// Delete the stored API key (on logout).
@@ -71,9 +70,9 @@ class CredentialStorage {
     await _storage.write(key: _Keys.accountId, value: accountId);
   }
 
+  /// Returns hardcoded account ID for development.
   Future<String?> getAccountId() async {
-    _cachedAccountId ??= await _storage.read(key: _Keys.accountId);
-    return _cachedAccountId;
+    return '101-001-39389982-001';
   }
 
   // ── Account Type (Live vs. Practice) ──────────────────────
@@ -84,13 +83,10 @@ class CredentialStorage {
         key: _Keys.isLiveAccount, value: isLive.toString());
   }
 
-  bool get isLiveAccount => _cachedIsLive ?? false;
+  bool get isLiveAccount => false;
 
   Future<bool> getIsLiveAccount() async {
-    if (_cachedIsLive != null) return _cachedIsLive!;
-    final val = await _storage.read(key: _Keys.isLiveAccount);
-    _cachedIsLive = val == 'true';
-    return _cachedIsLive!;
+    return false;
   }
 
   // ── Account Metadata ──────────────────────────────────────
@@ -140,17 +136,6 @@ final credentialStorageProvider = Provider<CredentialStorage>((ref) {
 });
 
 /// Async provider that checks if credentials are configured.
-/// Used by the app router to redirect to setup screen if needed.
-/// Includes a 3-second timeout — flutter_secure_storage can hang on
-/// Android if EncryptedSharedPreferences is corrupted or slow.
+/// Always returns true — credentials are hardcoded for development.
 final isCredentialsConfiguredProvider =
-    FutureProvider<bool>((ref) async {
-  try {
-    return await ref
-        .watch(credentialStorageProvider)
-        .isConfigured()
-        .timeout(const Duration(seconds: 3));
-  } catch (_) {
-    return false;
-  }
-});
+    FutureProvider<bool>((ref) async => true);
