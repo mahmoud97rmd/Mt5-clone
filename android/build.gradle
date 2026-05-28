@@ -19,6 +19,17 @@ buildscript {
     }
 }
 
+// Ensure all subprojects can resolve Google/Maven Central artifacts.
+// With PREFER_PROJECT mode, project-level repos override settings repos,
+// so we must declare them here for :app and plugin subprojects.
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://chaquo.com/maven" }
+    }
+}
+
 // Exclude transitive deps that are unavailable (Google Maven blocked in this env)
 configurations.all {
     resolutionStrategy {
