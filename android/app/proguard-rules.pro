@@ -6,6 +6,11 @@
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
 
+# Google Play Core — referenced by Flutter deferred components but not used
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+
 # Kotlin
 -keep class kotlin.** { *; }
 -keep class kotlin.Metadata { *; }
