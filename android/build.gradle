@@ -11,7 +11,7 @@ allprojects {
     }
 }
 
-// Chaquopy plugin needs its own repo declared in buildscript
+// Chaquopy uses apply plugin: syntax, so AGP + Chaquopy must be on buildscript classpath
 buildscript {
     repositories {
         google()
@@ -19,6 +19,7 @@ buildscript {
         maven { url "https://chaquo.com/maven" }
     }
     dependencies {
+        classpath "com.android.tools.build:gradle:8.2.2"
         classpath "com.chaquo.python:gradle:15.0.1"
     }
 }
