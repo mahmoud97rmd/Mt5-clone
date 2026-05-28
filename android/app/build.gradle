@@ -44,6 +44,7 @@ android {
             debuggable false
             minifyEnabled true
             shrinkResources true
+            signingConfig signingConfigs.debug
             buildConfigField "boolean", "ENABLE_LOGGING", "false"
             buildConfigField "String", "OANDA_BASE_URL", '"https://api-fxtrade.oanda.com"'
             buildConfigField "String", "OANDA_STREAM_URL", '"https://stream-fxtrade.oanda.com"'
