@@ -29,11 +29,6 @@ class _Keys {
 class CredentialStorage {
   final FlutterSecureStorage _storage;
 
-  // In-memory cache to avoid repeated disk reads on every request
-  String? _cachedApiKey;
-  String? _cachedAccountId;
-  bool? _cachedIsLive;
-
   CredentialStorage({FlutterSecureStorage? storage})
       : _storage = storage ??
             const FlutterSecureStorage(
@@ -46,9 +41,8 @@ class CredentialStorage {
 
   // ── API Key ────────────────────────────────────────────────
 
-  /// Save the OANDA API key securely. Clears in-memory cache.
+  /// Save the OANDA API key securely.
   Future<void> saveApiKey(String apiKey) async {
-    _cachedApiKey = apiKey;
     await _storage.write(key: _Keys.apiKey, value: apiKey);
   }
 
@@ -59,14 +53,12 @@ class CredentialStorage {
 
   /// Delete the stored API key (on logout).
   Future<void> deleteApiKey() async {
-    _cachedApiKey = null;
     await _storage.delete(key: _Keys.apiKey);
   }
 
   // ── Account ID ────────────────────────────────────────────
 
   Future<void> saveAccountId(String accountId) async {
-    _cachedAccountId = accountId;
     await _storage.write(key: _Keys.accountId, value: accountId);
   }
 
@@ -78,7 +70,6 @@ class CredentialStorage {
   // ── Account Type (Live vs. Practice) ──────────────────────
 
   Future<void> setIsLiveAccount(bool isLive) async {
-    _cachedIsLive = isLive;
     await _storage.write(
         key: _Keys.isLiveAccount, value: isLive.toString());
   }
@@ -120,9 +111,6 @@ class CredentialStorage {
   // ── Full Reset (logout) ────────────────────────────────────
 
   Future<void> clearAll() async {
-    _cachedApiKey = null;
-    _cachedAccountId = null;
-    _cachedIsLive = null;
     await _storage.deleteAll();
   }
 }
