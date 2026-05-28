@@ -75,11 +75,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- Chaquopy Python configuration reference -->
-        <meta-data
-            android:name="com.chaquo.python.BuildConfig"
-            android:value="com.mt5clone.app.BuildConfig" />
-
     </application>
 
 </manifest>

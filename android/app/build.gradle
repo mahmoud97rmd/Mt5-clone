@@ -10,9 +10,6 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-// Chaquopy MUST be applied after the android plugin
-apply plugin: "com.chaquo.python"
-
 android {
     namespace "com.mt5clone.app"
     compileSdk 36
@@ -26,12 +23,6 @@ android {
         versionName flutter.versionName
         multiDexEnabled true
 
-        // Chaquopy Python runtime
-        python {
-            version "3.11"
-            // Pip packages will be added when EA engine is implemented.
-        }
-
         ndk {
             abiFilters "arm64-v8a", "armeabi-v7a", "x86_64"
         }
@@ -44,7 +35,6 @@ android {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
             debuggable true
-            manifestPlaceholders["chaquopyDebuggable"] = "true"
             buildConfigField "boolean", "ENABLE_LOGGING", "true"
             buildConfigField "String", "OANDA_BASE_URL", '"https://api-fxpractice.oanda.com"'
             buildConfigField "String", "OANDA_STREAM_URL", '"https://stream-fxpractice.oanda.com"'
@@ -54,7 +44,6 @@ android {
             debuggable false
             minifyEnabled true
             shrinkResources true
-            manifestPlaceholders["chaquopyDebuggable"] = "false"
             buildConfigField "boolean", "ENABLE_LOGGING", "false"
             buildConfigField "String", "OANDA_BASE_URL", '"https://api-fxtrade.oanda.com"'
             buildConfigField "String", "OANDA_STREAM_URL", '"https://stream-fxtrade.oanda.com"'
