@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+import '../logging/app_logger.dart';
 import '../router/app_router.dart';
 import '../app/app_theme.dart';
 import '../app/app_state_notifier.dart';
@@ -44,21 +45,28 @@ class _Mt5AppState extends ConsumerState<Mt5App>
   // ============================================================
 
   Future<void> _bootstrap() async {
+    final log = AppLogger.instance;
+    log.info('Bootstrap started');
+
     // 1. Initialize account (fetch from OANDA)
     try {
       await ref.read(accountInitProvider.future);
+      log.info('Account initialized');
     } catch (e) {
-      debugPrint('Bootstrap: account init failed — $e');
+      log.warn('Account init failed — $e');
     }
 
     // 2. Start price streaming for watchlisted symbols
-    ref.read(streamBootstrapProvider);
+    try {
+      ref.read(streamBootstrapProvider);
+      log.info('Stream bootstrap triggered');
+    } catch (e) {
+      log.warn('Stream bootstrap failed — $e');
+    }
 
     // 3. Start stream health monitor (EA kill switch)
     ref.read(streamHealthMonitorProvider);
-
-    // 4. Auto-start any EAs configured for auto-start
-    // (handled in Phase 13 EA Engine)
+    log.info('Bootstrap complete');
   }
 
   // ============================================================

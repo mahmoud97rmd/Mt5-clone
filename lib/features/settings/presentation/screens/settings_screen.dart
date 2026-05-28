@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app/app_theme.dart';
+import '../../../../core/logging/app_logger.dart';
 import '../../../account/presentation/providers/account_providers.dart';
 import '../../../ea/data/datasources/permissions_channel.dart';
 
@@ -170,6 +171,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           SizedBox(height: 16.h),
 
+          // ── Logs Section ─────────────────────────────────────
+          _SectionHeader(title: 'Logs'),
+          _SettingsCard(
+            children: [
+              _SettingsTile(
+                icon: Icons.bug_report_outlined,
+                title: 'View Application Logs',
+                subtitle: 'See all app events and errors',
+                onTap: () => _showLogs(context),
+              ),
+              _SettingsTile(
+                icon: Icons.share_outlined,
+                title: 'Share Log File',
+                subtitle: AppLogger.instance.logFilePath ??
+                    'Log file not available',
+                onTap: () => _shareLogs(context),
+              ),
+              _SettingsTile(
+                icon: Icons.delete_sweep_outlined,
+                title: 'Clear Logs',
+                subtitle: 'Delete all recorded log entries',
+                onTap: () => _confirmClearLogs(context),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
           // ── About ───────────────────────────────────────────
           _SectionHeader(title: 'About'),
           _SettingsCard(
@@ -182,7 +210,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _SettingsTile(
                 icon: Icons.code,
                 title: 'Engine',
-                subtitle: 'Chaquopy Python 3.11 + Kotlin',
+                subtitle: 'Flutter 3.41.9 + Kotlin',
               ),
             ],
           ),
@@ -211,6 +239,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Cache cleared')),
               );
+            },
+            child: Text('Clear',
+                style: TextStyle(color: AppTheme.sellRed)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showLogs(BuildContext context) async {
+    final logs = await AppLogger.instance.readLogs();
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => _LogViewerScreen(logs: logs),
+      ),
+    );
+  }
+
+  Future<void> _shareLogs(BuildContext context) async {
+    final path = AppLogger.instance.logFilePath;
+    if (path == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No log file available')),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Log file: $path'),
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
+
+  void _confirmClearLogs(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear Logs'),
+        content: const Text('Delete all recorded log entries?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await AppLogger.instance.clearLogs();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Logs cleared')),
+                );
+              }
             },
             child: Text('Clear',
                 style: TextStyle(color: AppTheme.sellRed)),
@@ -266,6 +350,63 @@ class _SettingsCard extends StatelessWidget {
           return children[index ~/ 2];
         }),
       ),
+    );
+  }
+}
+
+class _LogViewerScreen extends StatelessWidget {
+  final String logs;
+  const _LogViewerScreen({required this.logs});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0E14),
+      appBar: AppBar(
+        title: Text(
+          'Application Logs',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        backgroundColor: const Color(0xFF0D1117),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.copy),
+            onPressed: () {
+              // Copy is handled by long-press on the text
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Long-press the log text to copy, or use Share Log File '
+                    'in Settings to get the file path',
+                  ),
+                  duration: Duration(seconds: 4),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: logs.isEmpty
+          ? const Center(
+              child: Text(
+                'No logs recorded yet',
+                style: TextStyle(color: Color(0xFF7D8590)),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(12),
+              child: SelectableText(
+                logs,
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 11,
+                  color: const Color(0xFFE6EDF3),
+                  height: 1.5,
+                ),
+              ),
+            ),
     );
   }
 }

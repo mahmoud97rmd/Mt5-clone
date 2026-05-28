@@ -17,18 +17,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/app/mt5_app.dart';
 import 'core/database/hive_cache_service.dart';
 import 'core/di/provider_overrides.dart';
+import 'core/logging/app_logger.dart';
 
 Future<void> main() async {
   // ── 1. Flutter binding ─────────────────────────────────────
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ── 2. Lock to portrait only (MT5 is portrait-first) ──────
+  // ── 2. Logger (before everything — captures all crashes) ───
+  await AppLogger.instance.initialize();
+  AppLogger.instance.info('App starting');
+
+  // ── 3. Lock to portrait only (MT5 is portrait-first) ──────
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  // ── 3. Status bar styling ──────────────────────────────────
+  // ── 4. Status bar styling ──────────────────────────────────
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -38,10 +43,11 @@ Future<void> main() async {
     ),
   );
 
-  // ── 4. Initialize Hive cache ───────────────────────────────
+  // ── 5. Initialize Hive cache ───────────────────────────────
   await HiveCacheService.initialize();
+  AppLogger.instance.info('Hive initialized');
 
-  // ── 5. Launch app ──────────────────────────────────────────
+  // ── 6. Launch app ──────────────────────────────────────────
   runApp(
     ProviderScope(
       overrides: buildProviderOverrides(),

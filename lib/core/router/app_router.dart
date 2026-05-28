@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/app/app_state_notifier.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/security/credential_storage.dart';
 import '../../features/charting/presentation/screens/chart_screen.dart';
 import '../../features/ea/presentation/screens/ea_logs_screen.dart';
@@ -43,6 +44,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final _ = isAuthenticated;
       final path = state.uri.path;
 
+      AppLogger.instance.debug(
+        'Router redirect — path: $path, configured: $configured, '
+        'isConfigured state: ${isConfigured.runtimeType}',
+      );
+
       // Allow splash and setup screens without auth
       final publicPaths = [
         RouteNames.splash,
@@ -52,7 +58,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (publicPaths.contains(path)) return null;
 
       // Redirect to setup if not configured
-      if (!configured) return RouteNames.setup;
+      if (!configured) {
+        AppLogger.instance.info('Redirecting to setup — not configured');
+        return RouteNames.setup;
+      }
 
       return null;
     },
@@ -345,22 +354,67 @@ class _SetupScreen extends StatelessWidget {
   }
 }
 
-class _SetupApiKeyScreen extends StatefulWidget {
+class _SetupApiKeyScreen extends ConsumerStatefulWidget {
   const _SetupApiKeyScreen();
   @override
-  State<_SetupApiKeyScreen> createState() => _SetupApiKeyScreenState();
+  ConsumerState<_SetupApiKeyScreen> createState() =>
+      _SetupApiKeyScreenState();
 }
 
-class _SetupApiKeyScreenState extends State<_SetupApiKeyScreen> {
+class _SetupApiKeyScreenState extends ConsumerState<_SetupApiKeyScreen> {
   final _apiKeyController = TextEditingController();
   final _accountIdController = TextEditingController();
   bool _isPractice = true;
+  bool _isSaving = false;
 
   @override
   void dispose() {
     _apiKeyController.dispose();
     _accountIdController.dispose();
     super.dispose();
+  }
+
+  Future<void> _connect() async {
+    final apiKey = _apiKeyController.text.trim();
+    final accountId = _accountIdController.text.trim();
+
+    if (apiKey.isEmpty || accountId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both API Key and Account ID'),
+          backgroundColor: Color(0xFFFF4757),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      final storage = ref.read(credentialStorageProvider);
+      await storage.saveApiKey(apiKey);
+      await storage.saveAccountId(accountId);
+      await storage.setIsLiveAccount(!_isPractice);
+
+      AppLogger.instance.info(
+        'Credentials saved — account: $accountId, '
+        'practice: $_isPractice',
+      );
+
+      if (mounted) context.go(RouteNames.trading);
+    } catch (e) {
+      AppLogger.instance.error('Failed to save credentials', e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: const Color(0xFFFF4757),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -481,10 +535,7 @@ class _SetupApiKeyScreenState extends State<_SetupApiKeyScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Save credentials and navigate
-                  context.go(RouteNames.trading);
-                },
+                onPressed: _isSaving ? null : _connect,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00D4AA),
                   foregroundColor: const Color(0xFF0A0E14),
@@ -492,11 +543,21 @@ class _SetupApiKeyScreenState extends State<_SetupApiKeyScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Connect',
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700),
-                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFF0A0E14),
+                        ),
+                      )
+                    : const Text(
+                        'Connect',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
               ),
             ),
           ],
