@@ -14,6 +14,10 @@ allprojects {
 // Redirect build output to project root (where Flutter expects the APK)
 rootProject.buildDir = "../build"
 
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
