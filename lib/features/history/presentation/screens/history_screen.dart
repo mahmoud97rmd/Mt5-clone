@@ -332,7 +332,7 @@ class _FilterChip extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
         decoration: BoxDecoration(
           color: isSelected
-              ? (color ?? AppTheme.primaryTeal).withOpacity(0.15)
+              ? (color ?? AppTheme.primaryTeal).withValues(alpha: 0.15)
               : AppTheme.surfaceElevated,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(

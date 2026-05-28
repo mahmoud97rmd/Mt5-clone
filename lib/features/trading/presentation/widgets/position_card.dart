@@ -50,7 +50,7 @@ class PositionCard extends StatelessWidget {
                   padding: EdgeInsets.symmetric(
                       horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: dirColor.withOpacity(0.15),
+                    color: dirColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Text(
@@ -216,9 +216,9 @@ class _ActionChip extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
         decoration: BoxDecoration(
-          color: c.withOpacity(0.12),
+          color: c.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(6.r),
-          border: Border.all(color: c.withOpacity(0.3), width: 0.5),
+          border: Border.all(color: c.withValues(alpha: 0.3), width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

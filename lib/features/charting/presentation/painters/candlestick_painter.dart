@@ -301,8 +301,8 @@ class CandlestickPainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppTheme.primaryTeal.withOpacity(0.25),
-            AppTheme.primaryTeal.withOpacity(0.0),
+            AppTheme.primaryTeal.withValues(alpha: 0.25),
+            AppTheme.primaryTeal.withValues(alpha: 0.0),
           ],
         ).createShader(chartRect)
         ..style = PaintingStyle.fill,

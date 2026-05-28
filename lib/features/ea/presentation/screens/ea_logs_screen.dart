@@ -149,7 +149,7 @@ class _LogLine extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
             decoration: BoxDecoration(
-              color: levelColor.withOpacity(0.15),
+              color: levelColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(3.r),
             ),
             child: Text(

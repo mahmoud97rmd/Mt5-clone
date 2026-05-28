@@ -39,7 +39,7 @@ class IndicatorsSheet extends ConsumerWidget {
           child: Column(
             children: [
               // ── Header ──────────────────────────────────────
-              _buildHeader(context, notifier),
+              _buildHeader(context, state, notifier),
 
               // ── Active Indicators List ──────────────────────
               Expanded(
@@ -73,7 +73,7 @@ class IndicatorsSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, IndicatorNotifier notifier) {
+  Widget _buildHeader(BuildContext context, IndicatorState state, IndicatorNotifier notifier) {
     return Padding(
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 8.h),
       child: Row(
@@ -87,7 +87,7 @@ class IndicatorsSheet extends ConsumerWidget {
             ),
           ),
           const Spacer(),
-          if (notifier.state.activeIndicators.isNotEmpty)
+          if (state.activeIndicators.isNotEmpty)
             TextButton(
               onPressed: notifier.clearAll,
               child: Text(

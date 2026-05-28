@@ -114,7 +114,7 @@ class _OrderCard extends StatelessWidget {
                 padding:
                     EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: dirColor.withOpacity(0.15),
+                  color: dirColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
@@ -171,10 +171,10 @@ class _OrderCard extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: AppTheme.sellRed.withOpacity(0.12),
+                    color: AppTheme.sellRed.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(4.r),
                     border: Border.all(
-                        color: AppTheme.sellRed.withOpacity(0.3), width: 0.5),
+                        color: AppTheme.sellRed.withValues(alpha: 0.3), width: 0.5),
                   ),
                   child: Text(
                     'Cancel',

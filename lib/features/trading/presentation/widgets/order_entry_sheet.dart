@@ -239,10 +239,10 @@ class _OrderEntrySheetState extends ConsumerState<OrderEntrySheet> {
                   padding: EdgeInsets.all(8.w),
                   margin: EdgeInsets.only(bottom: 12.h),
                   decoration: BoxDecoration(
-                    color: AppTheme.sellRed.withOpacity(0.1),
+                    color: AppTheme.sellRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6.r),
                     border: Border.all(
-                        color: AppTheme.sellRed.withOpacity(0.3)),
+                        color: AppTheme.sellRed.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     state.errorMessage!,
@@ -361,7 +361,7 @@ class _DirectionButton extends StatelessWidget {
       child: Container(
         height: 44.h,
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.2) : AppTheme.surfaceElevated,
+          color: isSelected ? color.withValues(alpha: 0.2) : AppTheme.surfaceElevated,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: isSelected ? color : AppTheme.surfaceBorder,

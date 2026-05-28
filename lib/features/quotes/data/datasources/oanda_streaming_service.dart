@@ -24,10 +24,8 @@
 // ============================================================
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:rxdart/rxdart.dart';
@@ -36,7 +34,6 @@ import '../../../../core/database/app_database.dart';
 import '../../../../core/database/daos/ticks_dao.dart';
 import '../../../../core/database/database_providers.dart';
 import '../../../../core/database/hive_cache_service.dart';
-import '../../../../core/database/tables/ticks_table.dart';
 import '../../../../core/domain/entities/tick_entity.dart';
 import '../../../../core/network/api_constants.dart';
 import '../../../../core/network/client/dio_client.dart';

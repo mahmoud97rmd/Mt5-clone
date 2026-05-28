@@ -15,7 +15,6 @@ import '../../../../core/domain/entities/position_entity.dart';
 import '../../../../core/domain/enums/trading_enums.dart';
 import '../../../../core/domain/failures/failures.dart';
 import '../../../../core/engine/account_math_engine.dart';
-import '../../../account/presentation/providers/account_providers.dart';
 import '../../../../core/database/database_providers.dart';
 import '../../data/repositories/trading_repository_impl.dart';
 

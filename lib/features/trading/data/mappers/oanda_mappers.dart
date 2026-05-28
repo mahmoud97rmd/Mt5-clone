@@ -18,7 +18,6 @@ import '../../../../core/domain/enums/trading_enums.dart';
 import '../models/trade_order_dto.dart';
 import '../models/transaction_candle_dto.dart';
 import '../../../account/data/models/account_dto.dart';
-import '../../../account/data/models/instrument_dto.dart';
 
 // ============================================================
 // 4.4.1 — Account Mapper

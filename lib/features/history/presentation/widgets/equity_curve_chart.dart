@@ -134,8 +134,8 @@ class _EquityCurvePainter extends CustomPainter {
         Offset(0, 0),
         Offset(0, size.height),
         [
-          AppTheme.primaryTeal.withOpacity(0.3),
-          AppTheme.primaryTeal.withOpacity(0.0),
+          AppTheme.primaryTeal.withValues(alpha: 0.3),
+          AppTheme.primaryTeal.withValues(alpha: 0.0),
         ],
       )
       ..style = PaintingStyle.fill;

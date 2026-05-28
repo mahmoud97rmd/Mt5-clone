@@ -165,6 +165,6 @@ class TickAssembler {
 
   /// Update pip location for a symbol (called when instruments load).
   void updatePipLocation(String symbol, int pipLocation) {
-    (_pipLocations as Map<String, int>)[symbol] = pipLocation;
+    _pipLocations[symbol] = pipLocation;
   }
 }

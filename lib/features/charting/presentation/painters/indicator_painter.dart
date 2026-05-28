@@ -5,8 +5,6 @@
 // ============================================================
 
 import 'dart:math' as math;
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 import '../../../../core/app/app_theme.dart';
@@ -123,7 +121,7 @@ class IndicatorOverlayPainter extends CustomPainter {
       final upper = series.lines[0];
       final lower = series.lines[2];
       _drawAreaFill(canvas, upper, lower, candleWidth, priceRange,
-          series.config.color.withOpacity(0.08));
+          series.config.color.withValues(alpha: 0.08));
     }
 
     // Ichimoku cloud fill
@@ -215,8 +213,8 @@ class IndicatorOverlayPainter extends CustomPainter {
     final isBullish = senkouA.length > 1 &&
         senkouA[senkouA.length ~/ 2].value > senkouB[senkouB.length ~/ 2].value;
     final cloudColor = isBullish
-        ? AppTheme.buyGreen.withOpacity(0.12)
-        : AppTheme.sellRed.withOpacity(0.12);
+        ? AppTheme.buyGreen.withValues(alpha: 0.12)
+        : AppTheme.sellRed.withValues(alpha: 0.12);
 
     canvas.drawPath(path, Paint()..color = cloudColor);
   }
@@ -308,7 +306,7 @@ class SubChartPainter extends CustomPainter {
           ((level.value - dataMin) / dataRange) * chartRect.height;
 
       final paint = Paint()
-        ..color = level.color.withOpacity(0.4)
+        ..color = level.color.withValues(alpha: 0.4)
         ..strokeWidth = 0.5;
 
       if (level.isDashed) {
@@ -394,7 +392,7 @@ class SubChartPainter extends CustomPainter {
 
       canvas.drawRect(
         Rect.fromLTWH(x - barWidth / 2, top, barWidth, bottom - top),
-        Paint()..color = color.withOpacity(0.7),
+        Paint()..color = color.withValues(alpha: 0.7),
       );
     }
   }

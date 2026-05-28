@@ -8,7 +8,6 @@ import '../../../../core/domain/entities/account_entity.dart';
 import '../../../../core/domain/entities/symbol_entity.dart';
 import '../../../../core/domain/enums/trading_enums.dart';
 import '../models/account_dto.dart';
-import '../models/instrument_dto.dart';
 
 // ============================================================
 // Account DTO → Domain Entity

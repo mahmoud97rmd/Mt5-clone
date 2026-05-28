@@ -10,7 +10,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app/app_theme.dart';
-import '../../../../core/domain/enums/trading_enums.dart';
 import '../../../account/presentation/providers/account_providers.dart';
 import '../../../ea/data/datasources/permissions_channel.dart';
 

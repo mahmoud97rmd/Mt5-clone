@@ -96,7 +96,7 @@ class _ModifyPositionSheetState extends ConsumerState<ModifyPositionSheet> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: dirColor.withOpacity(0.15),
+                    color: dirColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Text(
@@ -276,10 +276,10 @@ class _ModifyPositionSheetState extends ConsumerState<ModifyPositionSheet> {
                 padding: EdgeInsets.all(8.w),
                 margin: EdgeInsets.only(bottom: 12.h),
                 decoration: BoxDecoration(
-                  color: AppTheme.sellRed.withOpacity(0.1),
+                  color: AppTheme.sellRed.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(
-                      color: AppTheme.sellRed.withOpacity(0.3)),
+                      color: AppTheme.sellRed.withValues(alpha: 0.3)),
                 ),
                 child: Text(
                   _error!,

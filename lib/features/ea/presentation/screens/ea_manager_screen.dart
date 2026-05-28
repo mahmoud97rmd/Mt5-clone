@@ -246,7 +246,7 @@ class _EaCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(
                     horizontal: 8.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
+                  color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Row(
@@ -422,9 +422,9 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(6.r),
-          border: Border.all(color: color.withOpacity(0.3), width: 0.5),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 0.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -11,7 +11,6 @@ import '../../../../core/domain/entities/tick_entity.dart';
 import '../../../../core/domain/enums/trading_enums.dart';
 import '../../data/datasources/oanda_streaming_service.dart';
 import '../../data/models/stream_dto.dart';
-import '../../data/repositories/price_repository_impl.dart';
 import '../../../account/data/repositories/account_repository_impl.dart';
 import '../../../account/presentation/providers/account_providers.dart';
 
@@ -94,7 +93,7 @@ final marketWatchProvider =
 // ── Stream Bootstrap Provider ─────────────────────────────────
 
 final streamBootstrapProvider = FutureProvider<void>((ref) async {
-  final credentials = ref.watch(accountRepositoryProvider);
+  final _ = ref.watch(accountRepositoryProvider);
   final service = ref.watch(oandaStreamingServiceProvider);
 
   // Get watchlist symbols

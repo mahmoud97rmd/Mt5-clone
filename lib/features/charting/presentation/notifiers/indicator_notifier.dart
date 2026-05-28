@@ -4,8 +4,6 @@
 // Manages active indicator configurations and computed series.
 // ============================================================
 
-import 'dart:ui';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/entities/candle_entity.dart';

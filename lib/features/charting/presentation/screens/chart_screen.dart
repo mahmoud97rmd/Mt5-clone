@@ -12,7 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/app/app_theme.dart';
-import '../../../../core/domain/enums/trading_enums.dart';
 import '../../../../core/router/route_names.dart';
 import '../../../quotes/presentation/providers/quote_providers.dart';
 import '../../domain/indicators/indicator_models.dart';
@@ -20,7 +19,6 @@ import '../notifiers/chart_notifier.dart';
 import '../notifiers/indicator_notifier.dart';
 import '../painters/candlestick_painter.dart';
 import '../painters/indicator_painter.dart';
-import '../widgets/chart_toolbar.dart';
 import '../widgets/indicators_sheet.dart';
 import '../widgets/ohlcv_info_panel.dart';
 import '../widgets/sub_chart_panel.dart';
@@ -56,8 +54,6 @@ class _ChartScreenState extends ConsumerState<ChartScreen> {
     final currentPrice = liveTick?.ask ?? 0.0;
 
     // Indicators
-    final indicatorState =
-        ref.watch(indicatorNotifierProvider(widget.symbol));
     final onChartSeries =
         ref.watch(onChartIndicatorsProvider(widget.symbol));
     final subChartSeries =

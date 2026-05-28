@@ -45,10 +45,11 @@ class _Mt5AppState extends ConsumerState<Mt5App>
 
   Future<void> _bootstrap() async {
     // 1. Initialize account (fetch from OANDA)
-    await ref.read(accountInitProvider.future).catchError((e) {
+    try {
+      await ref.read(accountInitProvider.future);
+    } catch (e) {
       debugPrint('Bootstrap: account init failed — $e');
-      return null;
-    });
+    }
 
     // 2. Start price streaming for watchlisted symbols
     ref.read(streamBootstrapProvider);

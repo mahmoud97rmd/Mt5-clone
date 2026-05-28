@@ -173,13 +173,6 @@ class StreamHealthMonitor {
 
   // ── Helpers ──────────────────────────────────────────────────
 
-  String _formatTime(DateTime dt) {
-    final h = dt.hour.toString().padLeft(2, '0');
-    final m = dt.minute.toString().padLeft(2, '0');
-    final s = dt.second.toString().padLeft(2, '0');
-    final ms = (dt.millisecond).toString().padLeft(3, '0');
-    return '$h:$m:$s.$ms';
-  }
 
   // ============================================================
   // 5.8.6 — Dispose

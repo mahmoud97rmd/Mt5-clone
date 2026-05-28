@@ -6,7 +6,7 @@
 
 import '../../../../core/domain/entities/closed_trade_entity.dart';
 import '../../../../core/domain/enums/trading_enums.dart';
-import '../../../../core/domain/repositories/repositories.dart';
+
 
 class ClosedTradeMapper {
   static ClosedTradeEntity fromDb(dynamic row) {

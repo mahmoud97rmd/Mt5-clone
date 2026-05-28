@@ -96,10 +96,10 @@ class OpenPositionsTab extends ConsumerWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
-                    color: AppTheme.sellRed.withOpacity(0.12),
+                    color: AppTheme.sellRed.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(4.r),
                     border: Border.all(
-                        color: AppTheme.sellRed.withOpacity(0.3), width: 0.5),
+                        color: AppTheme.sellRed.withValues(alpha: 0.3), width: 0.5),
                   ),
                   child: state.isClosingAll
                       ? SizedBox(

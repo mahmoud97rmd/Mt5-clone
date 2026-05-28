@@ -15,7 +15,6 @@ import '../../../../core/app/app_theme.dart';
 import '../../../../core/domain/entities/symbol_entity.dart';
 import '../../../../core/router/route_names.dart';
 import '../providers/quote_providers.dart';
-import '../../data/repositories/price_repository_impl.dart';
 import '../../../account/presentation/providers/account_providers.dart';
 import '../../../account/data/repositories/account_repository_impl.dart';
 

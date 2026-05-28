@@ -82,7 +82,7 @@ class _StatusBar extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-      color: color.withOpacity(0.12),
+      color: color.withValues(alpha: 0.12),
       child: Row(
         children: [
           if (icon != null) ...[

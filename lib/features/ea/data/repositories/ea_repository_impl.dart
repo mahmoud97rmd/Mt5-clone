@@ -24,7 +24,7 @@ import '../../../../core/domain/repositories/repositories.dart';
 class EaRepositoryImpl implements IEaRepository {
   final EaDao _eaDao;
   static const _channel = MethodChannel('com.mt5clone/ea_engine');
-  static const _logChannel = EventChannel('com.mt5clone/ea_log_events');
+
 
   EaRepositoryImpl({required EaDao eaDao}) : _eaDao = eaDao;
 

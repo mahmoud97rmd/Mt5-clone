@@ -38,7 +38,7 @@ class ClosedTradeCard extends StatelessWidget {
                 padding:
                     EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: dirColor.withOpacity(0.15),
+                  color: dirColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(

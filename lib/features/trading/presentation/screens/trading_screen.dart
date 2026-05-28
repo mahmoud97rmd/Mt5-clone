@@ -11,7 +11,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app/app_theme.dart';
-import '../../../../core/domain/entities/position_entity.dart';
 import '../../../quotes/presentation/providers/quote_providers.dart';
 import '../notifiers/trading_notifiers.dart';
 import '../widgets/account_top_bar.dart';

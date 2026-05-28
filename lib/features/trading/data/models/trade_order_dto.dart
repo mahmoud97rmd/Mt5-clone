@@ -43,11 +43,11 @@ class TradeDto {
 
   // Computed getters for mapper convenience
   double get priceValue => double.tryParse(price ?? '0') ?? 0.0;
-  bool get isBuy => (double.tryParse(currentUnits ?? '0') ?? 0) > 0;
+  bool get isBuy => (double.tryParse(currentUnits) ?? 0) > 0;
   double get lots =>
-      (double.tryParse(currentUnits ?? '0') ?? 0).abs() / 100000.0;
+      (double.tryParse(currentUnits) ?? 0).abs() / 100000.0;
   double get currentUnitsValue =>
-      double.tryParse(currentUnits ?? '0') ?? 0.0;
+      double.tryParse(currentUnits) ?? 0.0;
   double get unrealizedPlValue =>
       double.tryParse(unrealizedPL ?? '0') ?? 0.0;
   double get financingValue =>
@@ -99,8 +99,8 @@ class OrderDto {
   });
 
   // Computed getters for mapper convenience
-  bool get isBuy => (double.tryParse(units ?? '0') ?? 0) > 0;
-  double get unitsValue => double.tryParse(units ?? '0') ?? 0.0;
+  bool get isBuy => (double.tryParse(units) ?? 0) > 0;
+  double get unitsValue => double.tryParse(units) ?? 0.0;
   double get priceValue => double.tryParse(price ?? '0') ?? 0.0;
   DateTime get createDateTime {
     final epochSeconds = double.tryParse(createTime ?? '0') ?? 0.0;

@@ -9,7 +9,7 @@ import 'package:logger/logger.dart';
 
 class LoggingInterceptor extends Interceptor {
   final Logger _log = Logger(
-    printer: PrettyPrinter(methodCount: 0, printTime: true),
+    printer: PrettyPrinter(methodCount: 0, dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart),
   );
 
   @override

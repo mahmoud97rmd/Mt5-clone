@@ -151,8 +151,8 @@ class _IndicatorTypeCard extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
               decoration: BoxDecoration(
                 color: type.isOnChart
-                    ? AppTheme.primaryTeal.withOpacity(0.15)
-                    : AppTheme.warningAmber.withOpacity(0.15),
+                    ? AppTheme.primaryTeal.withValues(alpha: 0.15)
+                    : AppTheme.warningAmber.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Text(

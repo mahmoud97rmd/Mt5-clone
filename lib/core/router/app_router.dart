@@ -40,7 +40,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     // ── Auth Redirect Guard ────────────────────────────────
     redirect: (context, state) {
       final configured = isConfigured.valueOrNull ?? false;
-      final authed = isAuthenticated;
+      final _ = isAuthenticated;
       final path = state.uri.path;
 
       // Allow splash and setup screens without auth

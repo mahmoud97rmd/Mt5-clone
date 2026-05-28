@@ -166,9 +166,9 @@ class IndicatorCalculators {
       lines: [upperPoints, middlePoints, lowerPoints],
       lineLabels: ['Upper', 'BB($period)', 'Lower'],
       lineColors: [
-        config.color.withOpacity(0.6),
+        config.color.withValues(alpha: 0.6),
         config.color,
-        config.color.withOpacity(0.6),
+        config.color.withValues(alpha: 0.6),
       ],
     );
   }

@@ -9,11 +9,9 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/database/database_providers.dart';
 import '../../../../core/domain/entities/tick_entity.dart';
 import '../../../../core/domain/failures/failures.dart';
 import '../../../../core/domain/repositories/repositories.dart';
-import '../../../../core/security/credential_storage.dart';
 import '../../../trading/data/datasources/oanda_rest_datasource.dart';
 import '../../../trading/data/mappers/oanda_mappers.dart';
 import '../datasources/oanda_streaming_service.dart';

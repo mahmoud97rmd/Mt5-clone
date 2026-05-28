@@ -5,14 +5,14 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app/app_theme.dart';
 import '../../../../core/domain/entities/ea_entities.dart';
-import '../../../../core/domain/enums/trading_enums.dart';
+
 import '../../data/datasources/ea_engine_channel.dart';
 import '../../data/datasources/file_picker_channel.dart';
 import '../../data/repositories/ea_repository_impl.dart';
@@ -221,7 +221,7 @@ class _EaSetupSheetState extends ConsumerState<EaSetupSheet> {
                   padding: EdgeInsets.all(8.w),
                   margin: EdgeInsets.only(bottom: 12.h),
                   decoration: BoxDecoration(
-                    color: AppTheme.sellRed.withOpacity(0.1),
+                    color: AppTheme.sellRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6.r),
                   ),
                   child: Text(
