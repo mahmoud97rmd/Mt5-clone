@@ -31,7 +31,7 @@ kotlin {
 // --------------------------------------------------------
 android {
     namespace "com.mt5clone.app"
-    compileSdk 35
+    compileSdk 36
     ndkVersion "28.2.13676358"
 
     // --------------------------------------------------------
@@ -56,19 +56,14 @@ android {
             // 3.11 is the latest stable supported by Chaquopy 16.x
             version "3.11"
 
-            // Python packages required by user EA scripts and internal bridge
-            pip {
-                install "numpy==1.26.4"
-                install "pandas==2.2.2"
-                install "pandas-ta==0.3.14b"
-                install "requests==2.32.3"
-                install "orjson==3.10.3"
-                install "scipy==1.13.0"
-                install "loguru==0.7.2"
-                install "python-dateutil==2.9.0"
-                install "pytz==2024.1"
-                install "pydantic==2.7.1"
-            }
+            // Python packages will be added when EA engine is implemented.
+            // Packages with native C extensions (numpy, pandas, scipy) require
+            // pre-built Chaquopy wheels — cannot be compiled from source in CI.
+            // pip {
+            //     install "numpy==1.26.4"   // needs Chaquopy wheel
+            //     install "pandas==2.2.2"   // needs Chaquopy wheel
+            //     install "scipy==1.13.0"   // needs Chaquopy wheel
+            // }
 
             // Python source directory defaults to src/main/python
         }

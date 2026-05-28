@@ -62,8 +62,8 @@ jobs:
           yes | sdkmanager --install \
             "ndk;28.2.13676358" \
             "cmake;3.22.1" \
-            "build-tools;35.0.0" \
-            "platforms;android-35" 2>&1 | tail -5
+            "build-tools;36.0.0" \
+            "platforms;android-36" 2>&1 | tail -5
 
       # ──────────────────────────────────────────────
       # 5. Python 3.11 for Chaquopy
