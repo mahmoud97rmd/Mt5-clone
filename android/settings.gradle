@@ -1,12 +1,9 @@
 // Path: android/settings.gradle
 // ============================================================
 // MT5 Clone — Android Project Settings
-// Configures: plugin management, module inclusion
+// Based on Flutter 3.41.9 canonical template
 // ============================================================
 
-// --------------------------------------------------------
-// 1.2.3.1 — Plugin Management (Gradle 7+ centralized approach)
-// --------------------------------------------------------
 pluginManagement {
     def flutterSdkPath = {
         def properties = new Properties()
@@ -19,44 +16,17 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
-        mavenLocal()
         google()
         mavenCentral()
-        // ⭐ Chaquopy plugin repository — MUST be here for settings plugin resolution
-        maven { url "https://chaquo.com/maven" }
         gradlePluginPortal()
     }
 }
 
-// --------------------------------------------------------
-// 1.2.3.2 — Build Script Plugin IDs
-// Maps plugin IDs to their classpath implementations
-// --------------------------------------------------------
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
     id "com.android.application" version "8.2.2" apply false
-    id "org.jetbrains.kotlin.android" version "1.9.22" apply false
+    id "org.jetbrains.kotlin.android" version "2.2.20" apply false
 }
 
-// --------------------------------------------------------
-// 1.2.3.3 — Dependency Resolution Management
-// Central dependency version resolution (Gradle 7.4+)
-// --------------------------------------------------------
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
-    repositories {
-        mavenLocal()
-        google()
-        mavenCentral()
-        // ⭐ Chaquopy artifact repository
-        maven { url "https://chaquo.com/maven" }
-        // JitPack for community packages
-        maven { url "https://jitpack.io" }
-    }
-}
-
-// --------------------------------------------------------
-// 1.2.3.4 — Project Modules
-// --------------------------------------------------------
 rootProject.name = "mt5_clone"
 include ":app"

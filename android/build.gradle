@@ -1,92 +1,36 @@
 // Path: android/build.gradle
 // ============================================================
 // MT5 Clone — Project-Level Gradle Build Configuration
-// Configures: AGP, Kotlin, Chaquopy Python bridge
+// Based on Flutter 3.41.9 canonical template
 // ============================================================
 
-buildscript {
-    repositories {
-        mavenLocal()
-        google()
-        mavenCentral()
-        maven { url "https://chaquo.com/maven" }
-        gradlePluginPortal()
-    }
-    dependencies {
-        // AGP needed on buildscript classpath for Chaquopy plugin resolution
-        classpath "com.android.tools.build:gradle:8.2.2"
-        classpath "com.chaquo.python:gradle:15.0.1"
-    }
-}
-
-// The Flutter Gradle plugin adds its own Maven repo to all projects,
-// which causes settings.gradle repos to be ignored (PREFER_PROJECT mode).
-// We must explicitly declare google() and mavenCentral() here.
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Chaquopy plugin needs its own repo declared in buildscript
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
         maven { url "https://chaquo.com/maven" }
-        maven { url "https://jitpack.io" }
+    }
+    dependencies {
+        classpath "com.chaquo.python:gradle:15.0.1"
     }
 }
 
-// Exclude transitive deps that are unavailable (Google Maven blocked in this env)
-configurations.all {
-    resolutionStrategy {
-        // Force cached versions where available
-        force "com.android.tools.build:bundletool:1.9.0"
-        // Exclude protos (analytics, not needed for build)
-        exclude group: "com.android.tools.analytics-library", module: "protos"
-    }
-}
-
-// Workaround: AGP 8+ requires namespace in all library modules.
-// Some Flutter plugins haven't been updated. Auto-set namespace from group.
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (namespace == null || namespace.toString().isEmpty()) {
-                    namespace = "${project.group}.${project.name}"
-                }
-            }
-            // AGP 8.2+ rejects package in AndroidManifest when namespace is set in build.gradle.
-            // Strip package attribute from plugin manifests automatically.
-            project.tasks.configureEach { task ->
-                if (task.name.startsWith('process') && task.name.endsWith('Manifest')) {
-                    task.doFirst {
-                        def manifestFiles = fileTree("${project.projectDir}/src/main")
-                        manifestFiles.include("**/AndroidManifest.xml")
-                        manifestFiles.each { manifest ->
-                            if (manifest.exists() && manifest.text.contains('package=')) {
-                                manifest.text = manifest.text.replaceAll(
-                                    '\\s+package="[^"]*"', ''
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// --------------------------------------------------------
-// 1.2.1.4 — Build Directory Configuration
-// Centralizes build outputs for cleaner workspace
-// --------------------------------------------------------
+// Build directory configuration
 rootProject.buildDir = "../build"
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    // Ensure all subprojects evaluate after root configuration
     project.evaluationDependsOn(":app")
 }
 
-// --------------------------------------------------------
-// 1.2.1.5 — Clean Task
-// --------------------------------------------------------
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

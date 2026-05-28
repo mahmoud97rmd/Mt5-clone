@@ -1,93 +1,49 @@
 // Path: android/app/build.gradle
 // ============================================================
 // MT5 Clone — App-Level Gradle Build Configuration
-// Configures: Chaquopy Python, NDK, ABI splits, signing,
-//             ProGuard rules, foreground service support
+// Based on Flutter 3.41.9 canonical template
 // ============================================================
 
-// --------------------------------------------------------
-// 1.2.2.1 — Apply Required Plugins
-// Order matters: android must come before chaquopy
-// --------------------------------------------------------
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "kotlin-kapt"                    // Annotation processing (Room)
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-// ⭐ Chaquopy MUST be applied AFTER the android plugin
+// Chaquopy MUST be applied after the android plugin
 apply plugin: "com.chaquo.python"
 
-// --------------------------------------------------------
-// 1.2.2.2 — Kotlin Configuration
-// --------------------------------------------------------
-kotlin {
-    jvmToolchain(17) // Java 17 required for AGP 8.x
-}
-
-// --------------------------------------------------------
-// 1.2.2.3 — Android Build Configuration
-// --------------------------------------------------------
 android {
     namespace "com.mt5clone.app"
     compileSdk 36
     ndkVersion "28.2.13676358"
 
-    // --------------------------------------------------------
-    // 1.2.2.4 — Default Config
-    // --------------------------------------------------------
     defaultConfig {
         applicationId "com.mt5clone.app"
-        minSdk 26                        // Android 8.0+ (Oreo) — foreground services stable
+        minSdk 26
         targetSdk 34
         versionCode flutter.versionCode
         versionName flutter.versionName
-
-        // MultiDex: Required because Chaquopy + MT5 features exceed 64K method limit
         multiDexEnabled true
 
-        // ⭐ Chaquopy Python Configuration Block
-        // --------------------------------------------------------
-        // 1.2.2.5 — Chaquopy Python Runtime Setup
-        // --------------------------------------------------------
+        // Chaquopy Python runtime
         python {
-            // Python version to embed in the APK
-            // 3.11 is the latest stable supported by Chaquopy 16.x
             version "3.11"
-
-            // Python packages will be added when EA engine is implemented.
-            // Packages with native C extensions (numpy, pandas, scipy) require
-            // pre-built Chaquopy wheels — cannot be compiled from source in CI.
-            // pip {
-            //     install "numpy==1.26.4"   // needs Chaquopy wheel
-            //     install "pandas==2.2.2"   // needs Chaquopy wheel
-            //     install "scipy==1.13.0"   // needs Chaquopy wheel
-            // }
-
-            // Python source directory defaults to src/main/python
+            // Pip packages will be added when EA engine is implemented.
         }
 
-        // ABI Filters — required by Chaquopy plugin
         ndk {
             abiFilters "arm64-v8a", "armeabi-v7a", "x86_64"
         }
 
-        // --------------------------------------------------------
-        // 1.2.2.6 — Test Instrumentation
-        // --------------------------------------------------------
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // --------------------------------------------------------
-    // 1.2.2.7 — Build Types
-    // --------------------------------------------------------
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
             debuggable true
-            // Chaquopy debugging: allow Python stacktraces to propagate
             manifestPlaceholders["chaquopyDebuggable"] = "true"
             buildConfigField "boolean", "ENABLE_LOGGING", "true"
             buildConfigField "String", "OANDA_BASE_URL", '"https://api-fxpractice.oanda.com"'
@@ -102,66 +58,28 @@ android {
             buildConfigField "boolean", "ENABLE_LOGGING", "false"
             buildConfigField "String", "OANDA_BASE_URL", '"https://api-fxtrade.oanda.com"'
             buildConfigField "String", "OANDA_STREAM_URL", '"https://stream-fxtrade.oanda.com"'
-
-            // ProGuard / R8 configuration
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            // Signing config for release builds
-            // Keys are loaded from keystore.properties (not committed to VCS)
-            if (project.hasProperty("keyStoreFile")) {
-                signingConfig signingConfigs.release
-            }
         }
     }
 
-    // --------------------------------------------------------
-    // 1.2.2.8 — Signing Configs
-    // Reads from keystore.properties for security
-    // --------------------------------------------------------
-    signingConfigs {
-        release {
-            def keystorePropertiesFile = rootProject.file("keystore.properties")
-            if (keystorePropertiesFile.exists()) {
-                def keystoreProperties = new Properties()
-                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-                keyAlias keystoreProperties["keyAlias"]
-                keyPassword keystoreProperties["keyPassword"]
-                storeFile file(keystoreProperties["storeFile"])
-                storePassword keystoreProperties["storePassword"]
-            }
-        }
-    }
-
-    // ABI splits removed — conflicts with ndk.abiFilters set by Chaquopy plugin
-
-    // --------------------------------------------------------
-    // 1.2.2.10 — Compile Options
-    // --------------------------------------------------------
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-        // Required for java.time.* APIs on Android (Oreo+)
         coreLibraryDesugaringEnabled true
     }
 
-    // --------------------------------------------------------
-    // 1.2.2.11 — Build Features
-    // --------------------------------------------------------
-    buildFeatures {
-        buildConfig true       // Enable BuildConfig generation
-        viewBinding true       // For native Android layouts (notification, service)
-        compose false          // We use Flutter, not Compose
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
-    // --------------------------------------------------------
-    // 1.2.2.12 — Packaging Options
-    // Resolve native library conflicts from multiple SDKs
-    // --------------------------------------------------------
+    buildFeatures {
+        buildConfig true
+    }
+
     packagingOptions {
-        // Exclude duplicate native library signatures
         excludes += [
             "META-INF/LICENSE",
             "META-INF/LICENSE.txt",
@@ -170,101 +88,58 @@ android {
             "META-INF/ASL2.0",
             "META-INF/*.kotlin_module"
         ]
-        // Pick first when duplicate .so files exist
         pickFirsts += [
             "lib/arm64-v8a/libsqlite3x.so",
             "lib/armeabi-v7a/libsqlite3x.so",
             "lib/x86_64/libsqlite3x.so"
         ]
-        // Merge service definitions
-        merges += ["META-INF/services/*"]
     }
 
-    // --------------------------------------------------------
-    // 1.2.2.13 — Lint Configuration
-    // --------------------------------------------------------
     lint {
         disable "InvalidPackage"
         checkReleaseBuilds false
         abortOnError false
     }
-
-    // --------------------------------------------------------
-    // 1.2.2.14 — Test Options
-    // --------------------------------------------------------
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-            returnDefaultValues = true
-        }
-    }
 }
 
-// --------------------------------------------------------
-// 1.2.2.15 — Dependencies
-// --------------------------------------------------------
 dependencies {
-    // --- Core Android ---
+    // Core Android
     implementation "androidx.core:core-ktx:1.13.1"
     implementation "androidx.appcompat:appcompat:1.7.0"
     implementation "com.google.android.material:material:1.12.0"
-    implementation "androidx.constraintlayout:constraintlayout:2.1.4"
-
-    // --- MultiDex ---
     implementation "androidx.multidex:multidex:2.0.1"
 
-    // --- Java 8+ Desugaring (java.time.* on Android < 26) ---
+    // Desugaring
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.4"
 
-    // --- Kotlin Coroutines ---
+    // Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1"
 
-    // --- Lifecycle & ViewModel ---
+    // Lifecycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.2"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2"
-    implementation "androidx.lifecycle:lifecycle-service:2.8.2"  // For EA foreground service
+    implementation "androidx.lifecycle:lifecycle-service:2.8.2"
 
-    // --- WorkManager (Scheduled tasks: auto-reconnect) ---
+    // WorkManager
     implementation "androidx.work:work-runtime-ktx:2.9.0"
 
-    // --- WakeLock (Keep EA running) ---
-    implementation "androidx.core:core-ktx:1.13.1"  // WakeLock via PowerManager
-
-    // --- Networking (OkHttp WebSocket for price streaming) ---
+    // Networking
     implementation "com.squareup.okhttp3:okhttp:4.12.0"
     implementation "com.squareup.okhttp3:logging-interceptor:4.12.0"
 
-    // --- JSON Parsing ---
+    // JSON
     implementation "com.google.code.gson:gson:2.11.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1"
 
-    // --- Encrypted Preferences (OANDA API key storage) ---
+    // Encrypted storage
     implementation "androidx.security:security-crypto:1.1.0-alpha06"
 
-    // --- Room Database (EA logs, native-side caching) ---
-    implementation "androidx.room:room-runtime:2.6.1"
-    implementation "androidx.room:room-ktx:2.6.1"
-    kapt "androidx.room:room-compiler:2.6.1"
-
-    // --- Notifications ---
-    implementation "androidx.core:core-ktx:1.13.1"  // NotificationCompat
-
-    // --- Chaquopy Python runtime (auto-included via plugin) ---
-    // No explicit dependency needed — Chaquopy plugin handles this
-
-    // --- Testing ---
+    // Testing
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:5.11.0"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1"
     androidTestImplementation "androidx.test.ext:junit:1.1.5"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
-    androidTestImplementation "androidx.test:runner:1.5.2"
 }
 
-// --------------------------------------------------------
-// 1.2.2.16 — Flutter Plugin Configuration
-// --------------------------------------------------------
 flutter {
     source "../.."
 }
