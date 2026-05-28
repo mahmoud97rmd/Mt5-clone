@@ -141,7 +141,16 @@ final credentialStorageProvider = Provider<CredentialStorage>((ref) {
 
 /// Async provider that checks if credentials are configured.
 /// Used by the app router to redirect to setup screen if needed.
+/// Includes a 3-second timeout — flutter_secure_storage can hang on
+/// Android if EncryptedSharedPreferences is corrupted or slow.
 final isCredentialsConfiguredProvider =
     FutureProvider<bool>((ref) async {
-  return ref.watch(credentialStorageProvider).isConfigured();
+  try {
+    return await ref
+        .watch(credentialStorageProvider)
+        .isConfigured()
+        .timeout(const Duration(seconds: 3));
+  } catch (_) {
+    return false;
+  }
 });

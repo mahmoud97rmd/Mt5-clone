@@ -255,8 +255,25 @@ CustomTransitionPage<void> _noTransition(
 // 7.3.3 — Internal Screens (Splash, Setup, Chart Default)
 // ============================================================
 
-class _SplashScreen extends StatelessWidget {
+class _SplashScreen extends StatefulWidget {
   const _SplashScreen();
+  @override
+  State<_SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<_SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Safety fallback: if redirect guard hasn't moved us within 4 seconds,
+    // force-navigate to setup. Handles flutter_secure_storage hangs.
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        context.go(RouteNames.setup);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
