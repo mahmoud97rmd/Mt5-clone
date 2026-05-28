@@ -1,11 +1,6 @@
 // Path: lib/main.dart
 // ============================================================
 // MT5 Clone — Application Entry Point
-// Bootstrap sequence:
-//   1. Flutter binding initialization
-//   2. Hive cache initialization
-//   3. ProviderScope + ProviderContainer setup
-//   4. App launch
 // ============================================================
 
 import 'dart:async';
@@ -19,48 +14,82 @@ import 'core/database/hive_cache_service.dart';
 import 'core/di/provider_overrides.dart';
 import 'core/logging/app_logger.dart';
 
-Future<void> main() async {
-  // ── 1. Flutter binding ─────────────────────────────────────
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  // Catch any error before Flutter binding is ready
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // ── 2. Logger (before everything — captures all crashes) ───
-  await AppLogger.instance.initialize();
-  AppLogger.instance.info('App starting');
+    // Set up Flutter-level error handling
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+      debugPrint('FLUTTER ERROR: ${details.exception}');
+      debugPrint('  Stack: ${details.stack}');
+      AppLogger.instance.error(
+        'Flutter error',
+        details.exception,
+        details.stack,
+      );
+    };
 
-  // ── 3. Lock to portrait only (MT5 is portrait-first) ──────
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+    // ── Logger ─────────────────────────────────────────────
+    try {
+      await AppLogger.instance
+          .initialize()
+          .timeout(const Duration(seconds: 3));
+    } catch (e) {
+      debugPrint('Logger init failed (non-fatal): $e');
+    }
+    AppLogger.instance.info('App starting');
 
-  // ── 4. Status bar styling ──────────────────────────────────
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF0D1117),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+    // ── Portrait lock ──────────────────────────────────────
+    try {
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    } catch (e) {
+      debugPrint('Orientation lock failed: $e');
+    }
 
-  // ── 5. Initialize Hive cache ───────────────────────────────
-  await HiveCacheService.initialize();
-  AppLogger.instance.info('Hive initialized');
+    // ── Status bar ─────────────────────────────────────────
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFF0D1117),
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
 
-  // ── 6. Launch app ──────────────────────────────────────────
-  runApp(
-    ProviderScope(
-      overrides: buildProviderOverrides(),
-      observers: [
-        AppRiverpodObserver(),
-      ],
-      child: const Mt5App(),
-    ),
-  );
+    // ── Hive ───────────────────────────────────────────────
+    try {
+      await HiveCacheService.initialize()
+          .timeout(const Duration(seconds: 5));
+      AppLogger.instance.info('Hive initialized');
+    } catch (e) {
+      debugPrint('Hive init failed: $e');
+      AppLogger.instance.error('Hive init failed', e);
+    }
+
+    // ── Launch ─────────────────────────────────────────────
+    AppLogger.instance.info('Launching runApp');
+    runApp(
+      ProviderScope(
+        overrides: buildProviderOverrides(),
+        observers: [AppRiverpodObserver()],
+        child: const Mt5App(),
+      ),
+    );
+  }, (error, stack) {
+    // Top-level error handler — catches anything missed
+    debugPrint('UNCAUGHT: $error');
+    debugPrint('  Stack: $stack');
+    AppLogger.instance.error('Uncaught error', error, stack);
+  });
 }
 
 // ============================================================
-// 7.1.1 — Riverpod Observer (for logging & debugging)
+// Riverpod Observer
 // ============================================================
 
 class AppRiverpodObserver extends ProviderObserver {
@@ -70,9 +99,9 @@ class AppRiverpodObserver extends ProviderObserver {
     Object? value,
     ProviderContainer container,
   ) {
-    // Only log in debug mode
     assert(() {
-      debugPrint('📦 Provider added: ${provider.name ?? provider.runtimeType}');
+      debugPrint(
+          'Provider added: ${provider.name ?? provider.runtimeType}');
       return true;
     }());
   }
@@ -85,20 +114,13 @@ class AppRiverpodObserver extends ProviderObserver {
     ProviderContainer container,
   ) {
     debugPrint(
-      '❌ Provider failed: ${provider.name ?? provider.runtimeType}\n'
-      'Error: $error',
+      'Provider failed: ${provider.name ?? provider.runtimeType}\n'
+      '  Error: $error',
     );
-  }
-
-  @override
-  void didDisposeProvider(
-    ProviderBase<Object?> provider,
-    ProviderContainer container,
-  ) {
-    assert(() {
-      debugPrint(
-          '🗑️ Provider disposed: ${provider.name ?? provider.runtimeType}');
-      return true;
-    }());
+    AppLogger.instance.error(
+      'Provider failed: ${provider.name ?? provider.runtimeType}',
+      error,
+      stackTrace,
+    );
   }
 }

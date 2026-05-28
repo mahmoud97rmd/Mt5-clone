@@ -9,7 +9,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 import '../logging/app_logger.dart';
 import '../router/app_router.dart';
@@ -33,6 +32,29 @@ class _Mt5AppState extends ConsumerState<Mt5App>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Show errors on screen instead of white screen
+    ErrorWidget.builder = (details) {
+      debugPrint('ErrorWidget: ${details.exception}');
+      return MaterialApp(
+        home: Scaffold(
+          backgroundColor: const Color(0xFF0A0E14),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Error: ${details.exception}\n\n${details.stack}',
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    };
 
     // Bootstrap side effects after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -110,35 +132,33 @@ class _Mt5AppState extends ConsumerState<Mt5App>
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return OverlaySupport.global(
-          child: MaterialApp.router(
-            title: 'MT5 Clone',
-            debugShowCheckedModeBanner: false,
+        return MaterialApp.router(
+          title: 'MT5 Clone',
+          debugShowCheckedModeBanner: false,
 
-            // ── Theme ─────────────────────────────────────────
-            theme: AppTheme.darkTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.dark,
+          // ── Theme ─────────────────────────────────────────
+          theme: AppTheme.darkTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.dark,
 
-            // ── Routing ───────────────────────────────────────
-            routerConfig: router,
+          // ── Routing ───────────────────────────────────────
+          routerConfig: router,
 
-            // ── Localization ──────────────────────────────────
-            locale: const Locale('en', 'US'),
+          // ── Localization ──────────────────────────────────
+          locale: const Locale('en', 'US'),
 
-            // ── Builder: global scaffold for overlays ─────────
-            builder: (context, child) {
-              // Ensure text scale factor doesn't break trading UI
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(
-                    MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.2),
-                  ),
+          // ── Builder: global scaffold for overlays ─────────
+          builder: (context, child) {
+            // Ensure text scale factor doesn't break trading UI
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(
+                  MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.2),
                 ),
-                child: child!,
-              );
-            },
-          ),
+              ),
+              child: child!,
+            );
+          },
         );
       },
     );
