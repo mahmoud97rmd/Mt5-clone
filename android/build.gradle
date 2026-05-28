@@ -19,14 +19,15 @@ buildscript {
     }
 }
 
-// Ensure all subprojects can resolve Google/Maven Central artifacts.
-// With PREFER_PROJECT mode, project-level repos override settings repos,
-// so we must declare them here for :app and plugin subprojects.
+// The Flutter Gradle plugin adds its own Maven repo to all projects,
+// which causes settings.gradle repos to be ignored (PREFER_PROJECT mode).
+// We must explicitly declare google() and mavenCentral() here.
 allprojects {
     repositories {
         google()
         mavenCentral()
         maven { url "https://chaquo.com/maven" }
+        maven { url "https://jitpack.io" }
     }
 }
 

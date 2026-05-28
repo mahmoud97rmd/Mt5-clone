@@ -43,7 +43,7 @@ plugins {
 // Central dependency version resolution (Gradle 7.4+)
 // --------------------------------------------------------
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         mavenLocal()
         google()
