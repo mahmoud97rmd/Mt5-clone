@@ -58,37 +58,51 @@ class _Mt5AppState extends ConsumerState<Mt5App>
   }
 
   Future<void> _bootstrap() async {
-    final log = AppLogger.instance;
-    log.info('Bootstrap started');
+    // ignore: avoid_print
+    print('MT5: bootstrap started');
 
-    // 1. Account init — this is the critical path
+    // 1. Account init
     try {
-      log.info('Reading accountInitProvider...');
+      // ignore: avoid_print
+      print('MT5: reading accountInitProvider...');
       final account = await ref.read(accountInitProvider.future);
-      log.info('Account OK — id: ${account.accountId}, '
+      // ignore: avoid_print
+      print('MT5: account OK — id: ${account.accountId}, '
           'balance: ${account.balance}');
+      AppLogger.instance.info(
+          'Account OK — id: ${account.accountId}, balance: ${account.balance}');
     } catch (e, st) {
-      log.error('Account init FAILED', e, st);
+      // ignore: avoid_print
+      print('MT5: account FAILED: $e');
+      print('MT5: stack: $st');
+      AppLogger.instance.error('Account init FAILED', e, st);
     }
 
     // 2. Price stream
     try {
-      log.info('Connecting price stream...');
+      // ignore: avoid_print
+      print('MT5: connecting price stream...');
       ref.read(streamBootstrapProvider);
-      log.info('Stream connected');
+      // ignore: avoid_print
+      print('MT5: stream connected');
     } catch (e, st) {
-      log.error('Stream FAILED', e, st);
+      // ignore: avoid_print
+      print('MT5: stream FAILED: $e');
+      AppLogger.instance.error('Stream FAILED', e, st);
     }
 
     // 3. Health monitor
     try {
       ref.read(streamHealthMonitorProvider);
-      log.info('Health monitor started');
+      // ignore: avoid_print
+      print('MT5: health monitor started');
     } catch (e) {
-      log.warn('Health monitor failed: $e');
+      // ignore: avoid_print
+      print('MT5: health monitor failed: $e');
     }
 
-    log.info('Bootstrap complete');
+    // ignore: avoid_print
+    print('MT5: bootstrap complete');
   }
 
   @override

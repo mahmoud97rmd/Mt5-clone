@@ -14,8 +14,10 @@ import 'core/logging/app_logger.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // ignore: avoid_print
+  print('MT5: main() started');
+
   AppLogger.instance.initialize();
-  AppLogger.instance.info('main() started');
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -26,18 +28,16 @@ void main() {
     ),
   );
 
-  AppLogger.instance.info('Calling runApp');
+  // ignore: avoid_print
+  print('MT5: calling runApp');
 
-  try {
-    runApp(
-      ProviderScope(
-        overrides: buildProviderOverrides(),
-        child: const Mt5App(),
-      ),
-    );
-    AppLogger.instance.info('runApp returned');
-  } catch (e, st) {
-    AppLogger.instance.error('runApp CRASHED', e, st);
-    debugPrint('runApp CRASHED: $e\n$st');
-  }
+  runApp(
+    ProviderScope(
+      overrides: buildProviderOverrides(),
+      child: const Mt5App(),
+    ),
+  );
+
+  // ignore: avoid_print
+  print('MT5: runApp returned');
 }

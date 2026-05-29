@@ -77,8 +77,9 @@ class AppLogger {
     final ts = DateTime.now().toIso8601String().substring(0, 23);
     final line = '$ts [$level] $message';
 
-    // Always print to logcat
-    debugPrint(line);
+    // Use print() — debugPrint is throttled on Android
+    // ignore: avoid_print
+    print(line);
 
     if (_initialized && _sink != null) {
       _sink!.writeln(line);
