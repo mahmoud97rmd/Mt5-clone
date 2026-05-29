@@ -1,8 +1,6 @@
 // Path: lib/core/logging/app_logger.dart
 // ============================================================
 // MT5 Clone — Application Logger
-// Writes logs to internal storage for debugging.
-// Log file: /data/data/com.mt5clone.app/files/mt5_logs/app.log
 // ============================================================
 
 import 'dart:io';
@@ -17,6 +15,9 @@ class AppLogger {
   IOSink? _sink;
   File? _logFile;
   bool _initialized = false;
+  final List<String> _buffer = [];
+
+  bool get isReady => _initialized;
 
   // ── Initialization ──────────────────────────────────────────
 
@@ -30,7 +31,6 @@ class AppLogger {
       }
       _logFile = File('${logDir.path}/app.log');
 
-      // Rotate if larger than 5 MB
       if (await _logFile!.exists()) {
         final size = await _logFile!.length();
         if (size > 5 * 1024 * 1024) {
@@ -42,8 +42,16 @@ class AppLogger {
       }
 
       _sink = _logFile!.openWrite(mode: FileMode.append);
+
+      // Flush buffered messages
+      for (final line in _buffer) {
+        _sink!.writeln(line);
+      }
+      _sink!.flush();
       _initialized = true;
+
       info('Logger initialized — ${_logFile!.path}');
+      info('Flushed ${_buffer.length} buffered messages');
     } catch (e) {
       debugPrint('AppLogger: failed to initialize — $e');
     }
@@ -68,9 +76,17 @@ class AppLogger {
   void _write(String level, String message) {
     final ts = DateTime.now().toIso8601String().substring(0, 23);
     final line = '$ts [$level] $message';
-    debugPrint(line); // always print to logcat
-    _sink?.writeln(line);
-    _sink?.flush();
+
+    // Always print to logcat
+    debugPrint(line);
+
+    if (_initialized && _sink != null) {
+      _sink!.writeln(line);
+      _sink!.flush();
+    } else {
+      // Buffer until file is ready
+      _buffer.add(line);
+    }
   }
 
   // ── Access Log File ─────────────────────────────────────────
@@ -83,13 +99,11 @@ class AppLogger {
   }
 
   Future<void> clearLogs() async {
-    _sink?.flush();
+    await _sink?.flush();
     if (_logFile != null && await _logFile!.exists()) {
       await _logFile!.writeAsString('');
     }
   }
-
-  // ── Cleanup ─────────────────────────────────────────────────
 
   Future<void> dispose() async {
     await _sink?.flush();
