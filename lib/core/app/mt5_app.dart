@@ -3,6 +3,8 @@
 // MT5 Clone — Root Application Widget
 // ============================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,34 +63,36 @@ class _Mt5AppState extends ConsumerState<Mt5App>
     // ignore: avoid_print
     print('MT5: bootstrap started');
 
-    // 1. Account init
+    // 1. Account init — with explicit timeout
     try {
       // ignore: avoid_print
       print('MT5: reading accountInitProvider...');
-      final account = await ref.read(accountInitProvider.future);
+      final account = await ref
+          .read(accountInitProvider.future)
+          .timeout(const Duration(seconds: 20), onTimeout: () {
+        // ignore: avoid_print
+        print('MT5: account TIMEOUT after 20s');
+        throw TimeoutException('OANDA API timeout after 20 seconds');
+      });
       // ignore: avoid_print
       print('MT5: account OK — id: ${account.accountId}, '
           'balance: ${account.balance}');
-      AppLogger.instance.info(
-          'Account OK — id: ${account.accountId}, balance: ${account.balance}');
     } catch (e, st) {
       // ignore: avoid_print
       print('MT5: account FAILED: $e');
-      print('MT5: stack: $st');
       AppLogger.instance.error('Account init FAILED', e, st);
     }
 
-    // 2. Price stream
+    // 2. Price stream — only if account loaded
     try {
       // ignore: avoid_print
       print('MT5: connecting price stream...');
       ref.read(streamBootstrapProvider);
       // ignore: avoid_print
       print('MT5: stream connected');
-    } catch (e, st) {
+    } catch (e) {
       // ignore: avoid_print
       print('MT5: stream FAILED: $e');
-      AppLogger.instance.error('Stream FAILED', e, st);
     }
 
     // 3. Health monitor
