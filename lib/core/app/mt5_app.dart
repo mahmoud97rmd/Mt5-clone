@@ -61,21 +61,33 @@ class _Mt5AppState extends ConsumerState<Mt5App>
     final log = AppLogger.instance;
     log.info('Bootstrap started');
 
+    // 1. Account init — this is the critical path
     try {
-      await ref.read(accountInitProvider.future);
-      log.info('Account initialized');
-    } catch (e) {
-      log.warn('Account init failed — $e');
+      log.info('Reading accountInitProvider...');
+      final account = await ref.read(accountInitProvider.future);
+      log.info('Account OK — id: ${account.accountId}, '
+          'balance: ${account.balance}');
+    } catch (e, st) {
+      log.error('Account init FAILED', e, st);
     }
 
+    // 2. Price stream
     try {
+      log.info('Connecting price stream...');
       ref.read(streamBootstrapProvider);
-      log.info('Stream bootstrap triggered');
-    } catch (e) {
-      log.warn('Stream bootstrap failed — $e');
+      log.info('Stream connected');
+    } catch (e, st) {
+      log.error('Stream FAILED', e, st);
     }
 
-    ref.read(streamHealthMonitorProvider);
+    // 3. Health monitor
+    try {
+      ref.read(streamHealthMonitorProvider);
+      log.info('Health monitor started');
+    } catch (e) {
+      log.warn('Health monitor failed: $e');
+    }
+
     log.info('Bootstrap complete');
   }
 

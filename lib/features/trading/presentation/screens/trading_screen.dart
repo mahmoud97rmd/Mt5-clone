@@ -11,6 +11,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/app/app_theme.dart';
+import '../../../account/presentation/providers/account_providers.dart';
 import '../../../quotes/presentation/providers/quote_providers.dart';
 import '../notifiers/trading_notifiers.dart';
 import '../widgets/account_top_bar.dart';
@@ -29,11 +30,30 @@ class TradingScreen extends ConsumerStatefulWidget {
 class _TradingScreenState extends ConsumerState<TradingScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String? _connectionError;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _checkConnection();
+  }
+
+  Future<void> _checkConnection() async {
+    try {
+      final accountAsync = ref.read(accountInitProvider);
+      accountAsync.when(
+        data: (_) {
+          if (mounted) setState(() => _connectionError = null);
+        },
+        loading: () {},
+        error: (e, _) {
+          if (mounted) setState(() => _connectionError = e.toString());
+        },
+      );
+    } catch (e) {
+      if (mounted) setState(() => _connectionError = e.toString());
+    }
   }
 
   @override
@@ -44,6 +64,8 @@ class _TradingScreenState extends ConsumerState<TradingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final accountAsync = ref.watch(accountInitProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -63,6 +85,17 @@ class _TradingScreenState extends ConsumerState<TradingScreen>
       ),
       body: Column(
         children: [
+          // ── Connection Error Banner ────────────────────────
+          if (_connectionError != null || accountAsync.hasError)
+            _ErrorBanner(
+              message: _connectionError ??
+                  accountAsync.error.toString(),
+              onRetry: () {
+                ref.invalidate(accountInitProvider);
+                setState(() => _connectionError = null);
+              },
+            ),
+
           // ── Account Top Bar ─────────────────────────────────
           const AccountTopBar(),
 
@@ -118,5 +151,44 @@ class _TradingScreenState extends ConsumerState<TradingScreen>
     if (pos != null) {
       ModifyPositionSheet.show(context, pos);
     }
+  }
+}
+
+class _ErrorBanner extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ErrorBanner({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      color: const Color(0x33FF4757),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline,
+              color: Color(0xFFFF4757), size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Connection error: $message',
+              style: const TextStyle(
+                color: Color(0xFFFF4757),
+                fontSize: 11,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          TextButton(
+            onPressed: onRetry,
+            child: const Text('Retry',
+                style: TextStyle(fontSize: 11)),
+          ),
+        ],
+      ),
+    );
   }
 }
