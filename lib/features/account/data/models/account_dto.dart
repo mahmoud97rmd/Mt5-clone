@@ -13,7 +13,9 @@ class AccountSummaryDto {
   final String id;
   final String currency;
   final String balance;
+  @JsonKey(name: 'unrealizedPL')
   final String unrealizedPl;
+  @JsonKey(name: 'realizedPL')
   final String realizedPl;
   final String marginUsed;
   final String marginAvailable;

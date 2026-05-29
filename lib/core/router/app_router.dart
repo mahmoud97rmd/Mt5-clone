@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/app/app_state_notifier.dart';
 import '../../core/logging/app_logger.dart';
 import '../../core/security/credential_storage.dart';
 import '../../features/charting/presentation/screens/chart_screen.dart';
@@ -30,7 +29,6 @@ import 'app_shell.dart';
 // ============================================================
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final isAuthenticated = ref.watch(isAuthenticatedProvider);
   final isConfigured =
       ref.watch(isCredentialsConfiguredProvider);
 
@@ -40,14 +38,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
     // ── Auth Redirect Guard ────────────────────────────────
     redirect: (context, state) {
-      final configured = isConfigured.valueOrNull ?? false;
-      final _ = isAuthenticated;
       final path = state.uri.path;
-
-      AppLogger.instance.debug(
-        'Router redirect — path: $path, configured: $configured, '
-        'isConfigured state: ${isConfigured.runtimeType}',
-      );
 
       // Allow splash and setup screens without auth
       final publicPaths = [
@@ -57,9 +48,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ];
       if (publicPaths.contains(path)) return null;
 
+      // While provider is loading, don't redirect (stay on current page)
+      if (isConfigured.isLoading) return null;
+
+      final configured = isConfigured.valueOrNull ?? false;
+
       // Redirect to setup if not configured
       if (!configured) {
-        AppLogger.instance.info('Redirecting to setup — not configured');
         return RouteNames.setup;
       }
 

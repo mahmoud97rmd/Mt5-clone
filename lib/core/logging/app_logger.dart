@@ -41,19 +41,24 @@ class AppLogger {
         }
       }
 
+      // Close existing sink before creating a new one
+      await _sink?.flush();
+      await _sink?.close();
+      _sink = null;
+
       _sink = _logFile!.openWrite(mode: FileMode.append);
+      _initialized = true;
 
       // Flush buffered messages
       for (final line in _buffer) {
         _sink!.writeln(line);
       }
       _sink!.flush();
-      _initialized = true;
 
       info('Logger initialized — ${_logFile!.path}');
-      info('Flushed ${_buffer.length} buffered messages');
     } catch (e) {
-      debugPrint('AppLogger: failed to initialize — $e');
+      // ignore: avoid_print
+      print('AppLogger: failed to initialize — $e');
     }
   }
 
